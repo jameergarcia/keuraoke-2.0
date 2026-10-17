@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>KEURAOKE 2.0</title>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0a0b14;
+      --card-bg: rgba(26, 27, 46, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #ff0055;
+      --primary-glow: rgba(255, 0, 85, 0.4);
+      --secondary: #00f2fe;
+      --secondary-glow: rgba(0, 242, 254, 0.4);
+      --text-main: #ffffff;
+      --text-muted: #8e95b0;
+      --nav-height: 65px;
+      --header-height: 55px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(255, 0, 85, 0.15), transparent 35%),
+        radial-gradient(circle at 85% 90%, rgba(0, 242, 254, 0.15), transparent 35%),
+        linear-gradient(180deg, #07080f 0%, #0d0f1e 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      height: 100dvh;
+      width: 100vw;
+      overflow: hidden; /* Bawal ang scroll sa buong window */
+      position: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Portrait Mobile Wrapper */
+    #app-container {
+      width: 100%;
+      max-width: 450px;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: rgba(10, 11, 20, 0.85);
+      border-left: 1px solid var(--card-border);
+      border-right: 1px solid var(--card-border);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(15, 17, 30, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 1.15rem;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand span {
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .badge-vip {
+      font-size: 0.65rem;
+      background: linear-gradient(45deg, #ff007f, #7928ca);
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Main Viewports */
+    main {
+      flex: 1;
+      height: calc(100dvh - var(--header-height) - var(--nav-height));
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tab-content {
+      display: none;
+      height: 100%;
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 15px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-content::-webkit-scrollbar {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Mini Player Bar (PureTuber Style) */
+    #mini-player {
+      display: none;
+      height: 60px;
+      background: rgba(22, 24, 42, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 12px;
+      align-items: center;
+      gap: 10px;
+      z-index: 25;
+    }
+    #mini-player.active {
+      display: flex;
+    }
+    .mini-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--secondary);
+    }
+    .mini-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .mini-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mini-artist {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .mini-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+    .icon-btn:active {
+      transform: scale(0.9);
+      background: var(--primary);
+    }
+
+    /* Bottom Navigation Bar */
+    nav.bottom-nav {
+      height: var(--nav-height);
+      background: rgba(14, 16, 28, 0.98);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 30;
+      padding: 0 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      gap: 4px;
+      width: 18%;
+      transition: color 0.2s, transform 0.15s;
+    }
+    .nav-item i {
+      font-size: 1.15rem;
+    }
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .nav-item.active i {
+      text-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Studio / Recording Modal (StarMaker Style) */
+    #studio-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+    }
+    #studio-modal.open {
+      display: flex;
+    }
+    .studio-header {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      background: rgba(0,0,0,0.7);
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+    }
+    .video-viewport {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+    }
+    #youtube-embed-wrapper {
+      width: 100%;
+      height: 48%;
+      background: #000;
+      position: relative;
+    }
+    #youtube-embed-wrapper iframe, #yt-player {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #camera-preview-wrapper {
+      width: 100%;
+      height: 52%;
+      position: relative;
+      background: #111;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #camera-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Mirror camera */
+    }
+    .rec-indicator {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(255,0,0,0.4);
+    }
+    .rec-dot {
+      width: 9px;
+      height: 9px;
+      background: #ff0000;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .studio-footer {
+      height: 90px;
+      background: rgba(10, 11, 20, 0.95);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 16px;
+    }
+    .btn-rec {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid #fff;
+      color: #fff;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+    .btn-rec.recording {
+      background: #ffaa00;
+      animation: pulse 1.2s infinite;
+    }
+
+    /* Common Card Styles */
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 14px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e5e8f5;
+    }
+    .song-card {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      margin: 8px 12px;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      gap: 10px;
+      transition: background 0.2s;
+    }
+    .song-card:active {
+      background: rgba(255,255,255,0.08);
+    }
+    .song-thumb {
+      width: 55px;
+      height: 55px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .song-details {
+      flex: 1;
+      overflow: hidden;
+    }
+    .song-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .song-artist {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .song-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-sing {
+      background: linear-gradient(135deg, var(--primary), #b3003b);
+      border: none;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-add-queue {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      font-size: 0.75rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Social Media Post Styles */
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      margin: 12px;
+      overflow: hidden;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+    }
+    .post-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--secondary);
+    }
+    .post-username {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .post-time {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+    .btn-follow {
+      background: rgba(0, 242, 254, 0.15);
+      border: 1px solid var(--secondary);
+      color: var(--secondary);
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+    .btn-follow.following {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--text-muted);
+      color: var(--text-muted);
+    }
+    .post-video-container {
+      width: 100%;
+      background: #000;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .post-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .post-caption {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+    }
+    .post-actions {
+      display: flex;
+      padding: 8px 12px 10px;
+      gap: 16px;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .action-item.liked {
+      color: var(--primary);
+    }
+    .comments-box {
+      background: rgba(0,0,0,0.25);
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    /* Tasks Styles */
+    .task-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      margin: 8px 12px;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .task-info h4 {
+      font-size: 0.85rem;
+      margin-bottom: 3px;
+    }
+    .task-info p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .task-reward {
+      color: #ffd700;
+      font-weight: 700;
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-claim {
+      background: linear-gradient(45deg, #00f2fe, #4facfe);
+      border: none;
+      color: #050510;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .btn-claim:disabled {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    /* Search Bar */
+    .search-box {
+      margin: 10px 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      padding: 7px 14px;
+      gap: 8px;
+    }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    /* Modal / Alert Toast */
+    #toast {
+      position: absolute;
+      top: 65px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.85);
+      border: 1px solid var(--secondary);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      z-index: 200;
+      display: none;
+      box-shadow: 0 4px 15px rgba(0,242,254,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <div id="toast">Notipikasyon</div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-microphone-lines" style="color:var(--primary)"></i>
+      KEURAOKE <span>2.0</span>
+      <span class="badge-vip">PRO HD</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:0.75rem; color:#ffd700;"><i class="fa-solid fa-coins"></i> <span id="coin-balance">580</span></span>
+      <button class="icon-btn" onclick="switchTab('tab-login')"><i class="fa-solid fa-user"></i></button>
+    </div>
+  </header>
+
+  <!-- Content Screens (Tabs) -->
+  <main>
+    <!-- 1. HOME TAB -->
+    <div id="tab-home" class="tab-content active">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted)"></i>
+        <input type="text" id="search-input" placeholder="Mag-search ng YouTube Karaoke o Artist..." onkeyup="filterSongs()">
+      </div>
+
+      <div class="section-title">
+        <span>🔥 Trending Videoke</span>
+        <small style="color:var(--secondary); font-size:0.75rem;">PureTuber Format</small>
+      </div>
+
+      <div id="song-list-container">
+        <!-- Generated Dynamically -->
+      </div>
+    </div>
+
+    <!-- 2. QUEUE TAB -->
+    <div id="tab-queue" class="tab-content">
+      <div class="section-title">
+        <span>🎤 Videoke Song Queue</span>
+        <button class="btn-sing" style="background:#444;" onclick="clearQueue()">Clear All</button>
+      </div>
+      <div id="queue-list" style="margin-top:6px;">
+        <p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:30px;">Walang naka-reserve na kanta. Mag-add mula sa Home!</p>
+      </div>
+    </div>
+
+    <!-- 3. SOCIAL MEDIA TAB -->
+    <div id="tab-social" class="tab-content">
+      <div class="section-title">
+        <span>🌟 Keuraoke Community</span>
+        <small style="color:var(--primary); font-size:0.72rem;">Live Covers</small>
+      </div>
+      <div id="social-feed">
+        <!-- Pre-loaded / User-recorded Posts -->
+      </div>
+    </div>
+
+    <!-- 4. TASKS TAB -->
+    <div id="tab-tasks" class="tab-content">
+      <div class="section-title">
+        <span>🎯 Daily Rewards</span>
+        <span class="task-reward"><i class="fa-solid fa-coins"></i> Earn Coins</span>
+      </div>
+
+      <div class="task-card">
+        <div class="task-info">
+          <h4>Daily Attendance Check-in</h4>
+          <p>Login araw-araw para may libreng coins</p>
+          <span class="task-reward">+50 Coins</span>
+        </div>
+        <button class="btn-claim" onclick="claimTask(this, 50)">Claim</button>
+      </div>
+
+      <div class="task-card">
+        <div class="task-info">
+          <h4>Kumanta ng 1 Videoke Track</h4>
+          <p>Tapusin ang isang kanta sa Studio</p>
+          <span class="task-reward">+100 Coins</span>
+        </div>
+        <button class="btn-claim" onclick="claimTask(this, 100)">Claim</button>
+      </div>
+
+      <div class="task-card">
+        <div class="task-info">
+          <h4>Mag-post ng Recording sa Social</h4>
+          <p>I-share ang iyong cover video</p>
+          <span class="task-reward">+150 Coins</span>
+        </div>
+        <button class="btn-claim" onclick="claimTask(this, 150)">Claim</button>
+      </div>
+    </div>
+
+    <!-- 5. LOGIN / PROFILE TAB -->
+    <div id="tab-login" class="tab-content">
+      <div style="padding: 20px 14px; text-align: center;">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" class="avatar" style="width:75px; height:75px; margin: 0 auto 10px; border:2px solid var(--primary);">
+        <h3 id="profile-name">Keuraoke Idol</h3>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">Level 5 Singer • Pro Member</p>
+        
+        <div style="display:flex; justify-content:space-around; background:var(--card-bg); padding:10px; border-radius:12px; margin-bottom:15px; border:1px solid var(--card-border);">
+          <div><b id="rec-count">2</b><br><small style="font-size:0.7rem; color:var(--text-muted)">Recordings</small></div>
+          <div><b>1.2K</b><br><small style="font-size:0.7rem; color:var(--text-muted)">Followers</small></div>
+          <div><b>340</b><br><small style="font-size:0.7rem; color:var(--text-muted)">Following</small></div>
+        </div>
+
+        <div class="section-title" style="padding-left:0;">Saved Studio Covers (Local)</div>
+        <div id="saved-local-recordings">
+          <!-- Locally saved recorded media -->
+          <p style="color:var(--text-muted); font-size:0.75rem; margin-top:10px;">Lahat ng iyong na-record na video ay awtomatikong nai-save din dito at sa Social tab.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mini Player (PureTuber style floating player inside frame) -->
+  <div id="mini-player">
+    <img id="mini-img" src="" class="mini-thumb">
+    <div class="mini-info">
+      <div id="mini-song-title" class="mini-title">Pumili ng Kanta</div>
+      <div id="mini-song-artist" class="mini-artist">Artist</div>
+    </div>
+    <div class="mini-actions">
+      <button class="icon-btn" onclick="openStudioModal()"><i class="fa-solid fa-microphone"></i></button>
+      <button class="icon-btn" onclick="playNextInQueue()"><i class="fa-solid fa-forward-step"></i></button>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('tab-home')">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-queue')">
+      <i class="fa-solid fa-list-ol"></i>
+      <span>Queue</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-social')">
+      <i class="fa-solid fa-users"></i>
+      <span>Social</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-tasks')">
+      <i class="fa-solid fa-gift"></i>
+      <span>Tasks</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-login')">
+      <i class="fa-solid fa-user-circle"></i>
+      <span>Log In</span>
+    </button>
+  </nav>
+
+  <!-- Fullscreen Studio Modal (StarMaker Style Video + Embedded YouTube + 720p/1080p Front Camera Recording) -->
+  <div id="studio-modal">
+    <div class="studio-header">
+      <button class="icon-btn" onclick="closeStudioModal()"><i class="fa-solid fa-arrow-left"></i></button>
+      <span style="font-size:0.85rem; font-weight:700;"><i class="fa-solid fa-video"></i> Studio 720p-1080p Mode</span>
+      <button class="icon-btn" onclick="toggleCameraFacing()"><i class="fa-solid fa-camera-rotate"></i></button>
+    </div>
+
+    <div class="video-viewport">
+      <!-- 1. Embedded YouTube Karaoke Video -->
+      <div id="youtube-embed-wrapper">
+        <div id="yt-player"></div>
+      </div>
+
+      <!-- 2. Front Camera Live Viewport -->
+      <div id="camera-preview-wrapper">
+        <video id="camera-preview" autoplay playsinline muted></video>
+        <div class="rec-indicator" id="rec-status">
+          <div class="rec-dot"></div>
+          <span id="rec-timer">00:00</span> REC
+        </div>
+      </div>
+    </div>
+
+    <!-- Studio Bottom Bar -->
+    <div class="studio-footer">
+      <button class="icon-btn" onclick="toggleMic()" id="mic-toggle-btn" title="Mic toggle"><i class="fa-solid fa-microphone"></i></button>
+      <button class="btn-rec" id="record-btn" onclick="toggleRecording()"><i class="fa-solid fa-circle"></i></button>
+      <button class="icon-btn" onclick="saveAndPostRecording()" id="save-btn" title="Save to Social Media Folder"><i class="fa-solid fa-cloud-arrow-up"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Load YouTube Iframe API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script>
+  // --- Master Playlist (Working Embedded Karaoke Tracks) ---
+  const SONGS = [
+    { id: "e82VE83tWAA", title: "My Way (Videoke Version)", artist: "Frank Sinatra", thumb: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120" },
+    { id: "kJQP7kiw5Fk", title: "Despacito (Sing Along)", artist: "Luis Fonsi", thumb: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120" },
+    { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody (Karaoke)", artist: "Queen", thumb: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120" },
+    { id: "hT_nvWreIhg", title: "Counting Stars (Instrumental)", artist: "OneRepublic", thumb: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120" },
+    { id: "OPf0YbXqDm0", title: "Uptown Funk (Karaoke)", artist: "Mark Ronson ft. Bruno Mars", thumb: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=120" },
+    { id: "L_LUpnjgPso", title: "Torete (Pinoy Videoke)", artist: "Moonstar88", thumb: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=120" }
+  ];
+
+  let currentSong = SONGS[0];
+  let queueList = [];
+  let ytPlayer = null;
+  let isYtReady = false;
+
+  // Media & Recording Variables (HD Camera + Audio)
+  let localStream = null;
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let isRecording = false;
+  let recInterval = null;
+  let recSeconds = 0;
+  let lastRecordedBlobUrl = null;
+
+  // --- YouTube API Initialization ---
+  function onYouTubeIframeAPIReady() {
+    ytPlayer = new YT.Player('yt-player', {
+      videoId: currentSong.id,
+      playerVars: {
+        'autoplay': 0,
+        'controls': 1,
+        'rel': 0,
+        'playsinline': 1,
+        'modestbranding': 1
+      },
+      events: {
+        'onReady': () => { isYtReady = true; },
+        'onStateChange': onPlayerStateChange
+      }
+    });
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+      playNextInQueue();
+    }
+  }
+
+  // --- Render Home Songs ---
+  function renderSongs(songArray) {
+    const container = document.getElementById('song-list-container');
+    container.innerHTML = "";
+    songArray.forEach(song => {
+      const card = document.createElement('div');
+      card.className = "song-card";
+      card.innerHTML = `
+        <img src="${song.thumb}" class="song-thumb" alt="album">
+        <div class="song-details">
+          <div class="song-name">${song.title}</div>
+          <div class="song-artist">${song.artist}</div>
+        </div>
+        <div class="song-actions">
+          <button class="btn-add-queue" onclick="addToQueue('${song.id}')" title="Reserve Song"><i class="fa-solid fa-plus"></i></button>
+          <button class="btn-sing" onclick="startSingStudio('${song.id}')"><i class="fa-solid fa-microphone"></i> Sing</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function filterSongs() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtered = SONGS.filter(s => s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q));
+    renderSongs(filtered);
+  }
+
+  // --- Queue System ---
+  function addToQueue(songId) {
+    const song = SONGS.find(s => s.id === songId);
+    if (!song) return;
+    queueList.push(song);
+    renderQueue();
+    showToast(`Idinagdag si "${song.title}" sa Queue!`);
+  }
+
+  function renderQueue() {
+    const queueDiv = document.getElementById('queue-list');
+    if (queueList.length === 0) {
+      queueDiv.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:30px;">Walang naka-reserve na kanta.</p>`;
+      return;
+    }
+    queueDiv.innerHTML = "";
+    queueList.forEach((song, idx) => {
+      const item = document.createElement('div');
+      item.className = "song-card";
+      item.innerHTML = `
+        <div style="font-weight:700; width:22px; color:var(--secondary);">${idx + 1}</div>
+        <img src="${song.thumb}" class="song-thumb" style="width:40px; height:40px;">
+        <div class="song-details">
+          <div class="song-name">${song.title}</div>
+          <div class="song-artist">${song.artist}</div>
+        </div>
+        <button class="btn-sing" onclick="playQueuedTrack(${idx})"><i class="fa-solid fa-play"></i></button>
+      `;
+      queueDiv.appendChild(item);
+    });
+  }
+
+  function playQueuedTrack(index) {
+    const selected = queueList.splice(index, 1)[0];
+    renderQueue();
+    startSingStudio(selected.id);
+  }
+
+  function playNextInQueue() {
+    if (queueList.length > 0) {
+      const nextSong = queueList.shift();
+      renderQueue();
+      startSingStudio(nextSong.id);
+    } else {
+      showToast("Tapos na ang queue!");
+    }
+  }
+
+  function clearQueue() {
+    queueList = [];
+    renderQueue();
+    showToast("Cleared na ang Queue.");
+  }
+
+  // --- Mini Player & Studio Modal Logic ---
+  function updateMiniPlayer(song) {
+    currentSong = song;
+    document.getElementById('mini-img').src = song.thumb;
+    document.getElementById('mini-song-title').textContent = song.title;
+    document.getElementById('mini-song-artist').textContent = song.artist;
+    document.getElementById('mini-player').classList.add('active');
+  }
+
+  function openStudioModal() {
+    document.getElementById('studio-modal').classList.add('open');
+    initCamera();
+  }
+
+  function closeStudioModal() {
+    if (isRecording) stopRecordingProcess();
+    document.getElementById('studio-modal').classList.remove('open');
+    if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+    stopCameraStream();
+  }
+
+  function startSingStudio(songId) {
+    const song = SONGS.find(s => s.id === songId);
+    if (song) {
+      updateMiniPlayer(song);
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(song.id);
+      }
+    }
+    openStudioModal();
+  }
+
+  // --- Camera & Recording (StarMaker Mode: 720p/1080p HD) ---
+  async function initCamera() {
+    try {
+      if (localStream) stopCameraStream();
+
+      // Constraint para sa 720p/1080p HD front camera
+      const constraints = {
+        video: {
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
+          facingMode: "user"
+        },
+        audio: true
+      };
+
+      localStream = await navigator.mediaDevices.getUserMedia(constraints);
+      const camVideo = document.getElementById('camera-preview');
+      camVideo.srcObject = localStream;
+    } catch (err) {
+      console.warn("Camera/Mic not accessible or running on insecure origin:", err);
+      showToast("I-allow ang camera & microphone para makapag-record.");
+    }
+  }
+
+  function stopCameraStream() {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+  }
+
+  function toggleCameraFacing() {
+    showToast("Switched Camera quality & mode.");
+    initCamera();
+  }
+
+  function toggleMic() {
+    if (!localStream) return;
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      document.getElementById('mic-toggle-btn').innerHTML = audioTrack.enabled ? 
+        '<i class="fa-solid fa-microphone"></i>' : '<i class="fa-solid fa-microphone-slash" style="color:var(--primary);"></i>';
+      showToast(audioTrack.enabled ? "Microphone ON" : "Microphone MUTED");
+    }
+  }
+
+  // --- Record / Save to Social Media ---
+  function toggleRecording() {
+    if (!isRecording) {
+      startRecordingProcess();
+    } else {
+      stopRecordingProcess();
+    }
+  }
+
+  function startRecordingProcess() {
+    if (!localStream) {
+      showToast("Walang active camera feed para i-record.");
+      return;
+    }
+    recordedChunks = [];
+    try {
+      const options = { mimeType: 'video/webm;codecs=vp8,opus' };
+      mediaRecorder = new MediaRecorder(localStream, MediaRecorder.isTypeSupported(options.mimeType) ? options : undefined);
+    } catch (e) {
+      mediaRecorder = new MediaRecorder(localStream);
+    }
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      lastRecordedBlobUrl = URL.createObjectURL(blob);
+      showToast("Na-record ang kanta! Pindutin ang Cloud icon para i-save sa Social Media!");
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    document.getElementById('record-btn').classList.add('recording');
+    document.getElementById('record-btn').innerHTML = '<i class="fa-solid fa-stop"></i>';
+    document.getElementById('rec-status').style.display = 'flex';
+
+    if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
+
+    recSeconds = 0;
+    recInterval = setInterval(() => {
+      recSeconds++;
+      const m = String(Math.floor(recSeconds / 60)).padStart(2, '0');
+      const s = String(recSeconds % 60).padStart(2, '0');
+      document.getElementById('rec-timer').innerText = `${m}:${s}`;
+    }, 1000);
+  }
+
+  function stopRecordingProcess() {
+    if (!isRecording) return;
+    isRecording = false;
+    clearInterval(recInterval);
+    document.getElementById('record-btn').classList.remove('recording');
+    document.getElementById('record-btn').innerHTML = '<i class="fa-solid fa-circle"></i>';
+    document.getElementById('rec-status').style.display = 'none';
+
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+    }
+  }
+
+  function saveAndPostRecording() {
+    if (!lastRecordedBlobUrl) {
+      showToast("Kumanta at mag-record muna bago i-save!");
+      return;
+    }
+
+    // Add to Social Media Folder / Feed
+    addPostToSocialFeed({
+      user: "Keuraoke Idol (You)",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100",
+      songTitle: currentSong.title,
+      videoSrc: lastRecordedBlobUrl,
+      likes: 1
+    });
+
+    // Update Profile counts
+    const countEl = document.getElementById('rec-count');
+    countEl.textContent = parseInt(countEl.textContent) + 1;
+
+    showToast("Nai-save ang kanta sa Social Media Folder!");
+    closeStudioModal();
+    switchTab('tab-social');
+  }
+
+  // --- Social Media System ---
+  const INITIAL_POSTS = [
+    {
+      user: "Maria Singer PH",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+      songTitle: "My Way (Videoke Cover)",
+      videoSrc: "",
+      likes: 124,
+      comments: ["Galing mo po idol! 👏", "Pang-Grand Champion!"]
+    },
+    {
+      user: "John Videoke King",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
+      songTitle: "Torete (Acoustic Style)",
+      videoSrc: "",
+      likes: 89,
+      comments: ["Walang kupas! 🎤"]
+    }
+  ];
+
+  function renderSocialFeed() {
+    const feed = document.getElementById('social-feed');
+    feed.innerHTML = "";
+    INITIAL_POSTS.forEach((post, i) => {
+      feed.appendChild(createPostElement(post, i));
+    });
+  }
+
+  function createPostElement(post, idx) {
+    const card = document.createElement('div');
+    card.className = "post-card";
+    
+    // Video player or placeholder
+    const mediaContent = post.videoSrc 
+      ? `<video src="${post.videoSrc}" class="post-video" controls playsinline></video>`
+      : `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-muted);"><i class="fa-solid fa-play-circle" style="font-size:2.5rem; color:var(--secondary)"></i><span>Recorded Cover Video (720p HD)</span></div>`;
+
+    card.innerHTML = `
+      <div class="post-header">
+        <div class="post-user">
+          <img src="${post.avatar}" class="avatar">
+          <div>
+            <div class="post-username">${post.user}</div>
+            <div class="post-time">Nirecord kanina • 1080p</div>
+          </div>
+        </div>
+        <button class="btn-follow" onclick="toggleFollow(this)">+ Follow</button>
+      </div>
+      <div class="post-video-container">
+        ${mediaContent}
+      </div>
+      <div class="post-caption">
+        <strong>${post.songTitle}</strong> - Grabe ang saya kumanta sa Keuraoke 2.0! Salamat sa pakikinig! 🎶🔥
+      </div>
+      <div class="post-actions">
+        <div class="action-item" onclick="toggleLike(this, ${post.likes})">
+          <i class="fa-solid fa-heart"></i> <span class="like-counter">${post.likes}</span>
+        </div>
+        <div class="action-item" onclick="promptComment(this)">
+          <i class="fa-solid fa-comment"></i> <span>Comment</span>
+        </div>
+        <div class="action-item" onclick="showToast('Link Copied to Clipboard!')">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+        </div>
+      </div>
+      <div class="comments-box">
+        ${(post.comments || ["Ang ganda ng boses!"]).map(c => `<div>💬 ${c}</div>`).join('')}
+      </div>
+    `;
+    return card;
+  }
+
+  function addPostToSocialFeed(postObj) {
+    INITIAL_POSTS.unshift(postObj);
+    renderSocialFeed();
+  }
+
+  function toggleLike(el, currentCount) {
+    el.classList.toggle('liked');
+    const counter = el.querySelector('.like-counter');
+    let count = parseInt(counter.textContent);
+    if (el.classList.contains('liked')) {
+      counter.textContent = count + 1;
+    } else {
+      counter.textContent = Math.max(0, count - 1);
+    }
+  }
+
+  function toggleFollow(btn) {
+    btn.classList.toggle('following');
+    btn.innerText = btn.classList.contains('following') ? 'Following' : '+ Follow';
+    showToast(btn.classList.contains('following') ? "Na-follow mo na ang singer!" : "Unfollowed");
+  }
+
+  function promptComment(el) {
+    const userComment = prompt("Isulat ang iyong komento:");
+    if (userComment && userComment.trim() !== "") {
+      const box = el.closest('.post-card').querySelector('.comments-box');
+      const newCommentDiv = document.createElement('div');
+      newCommentDiv.innerHTML = `💬 <b>You:</b> ${userComment}`;
+      box.appendChild(newCommentDiv);
+      showToast("Nai-post ang comment!");
+    }
+  }
+
+  // --- Task Rewards ---
+  function claimTask(btn, reward) {
+    btn.disabled = true;
+    btn.innerText = "Claimed";
+    const coinEl = document.getElementById('coin-balance');
+    let coins = parseInt(coinEl.textContent);
+    coinEl.textContent = coins + reward;
+    showToast(`+${reward} Keuraoke Coins na-claim mo!`);
+  }
+
+  // --- Navigation & Utility ---
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+    const targetTab = document.getElementById(tabId);
+    if (targetTab) targetTab.classList.add('active');
+
+    // Button active state matching
+    const navButtons = document.querySelectorAll('.bottom-nav .nav-item');
+    const map = {
+      'tab-home': 0,
+      'tab-queue': 1,
+      'tab-social': 2,
+      'tab-tasks': 3,
+      'tab-login': 4
+    };
+    if (navButtons[map[tabId]]) {
+      navButtons[map[tabId]].classList.add('active');
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.innerText = msg;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2400);
+  }
+
+  // Initial Boot
+  window.addEventListener('DOMContentLoaded', () => {
+    renderSongs(SONGS);
+    renderSocialFeed();
+    updateMiniPlayer(SONGS[0]);
+  });
+</script>
+</body>
+</html>
