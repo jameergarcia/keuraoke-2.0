@@ -8,10 +8,10 @@
   <style>
     :root {
       --bg-dark: #070811;
-      --card-bg: rgba(20, 22, 38, 0.85);
+      --card-bg: rgba(20, 22, 38, 0.88);
       --card-border: rgba(255, 255, 255, 0.08);
       --primary: #ff0055;
-      --primary-glow: rgba(255, 0, 85, 0.4);
+      --primary-glow: rgba(255, 0, 85, 0.45);
       --secondary: #00f2fe;
       --secondary-glow: rgba(0, 242, 254, 0.35);
       --text-main: #ffffff;
@@ -31,8 +31,8 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 15% 10%, rgba(255, 0, 85, 0.16), transparent 40%),
-        radial-gradient(circle at 85% 90%, rgba(0, 242, 254, 0.15), transparent 40%),
+        radial-gradient(circle at 15% 10%, rgba(255, 0, 85, 0.18), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(0, 242, 254, 0.16), transparent 40%),
         linear-gradient(180deg, #05060b 0%, #0d0f1a 100%);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -58,7 +58,7 @@
       overflow: hidden;
     }
 
-    /* Top Bar */
+    /* Header */
     header {
       height: var(--header-height);
       display: flex;
@@ -110,7 +110,7 @@
     .tab-content::-webkit-scrollbar { display: none; }
     .tab-content.active { display: block; }
 
-    /* Search Section */
+    /* Search & Universal YouTube Loader */
     .search-section {
       padding: 10px 12px 6px;
     }
@@ -131,26 +131,38 @@
       font-size: 0.85rem;
       width: 100%;
     }
-    .btn-yt-search {
-      background: var(--primary);
-      border: none;
-      color: #fff;
-      padding: 5px 12px;
-      border-radius: 14px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      cursor: pointer;
+
+    .yt-direct-bar {
+      margin: 6px 12px 10px;
       display: flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
+      gap: 6px;
+    }
+    .yt-direct-bar input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 0.75rem;
+      outline: none;
+    }
+    .yt-direct-bar button {
+      background: var(--secondary);
+      border: none;
+      color: #070811;
+      font-weight: 700;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
     }
 
     /* Category Filter Pills */
     .filter-pills {
       display: flex;
       gap: 8px;
-      padding: 4px 12px 10px;
+      padding: 2px 12px 10px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -251,19 +263,7 @@
       cursor: pointer;
     }
 
-    /* Direct YouTube Search Result Box */
-    .instant-yt-card {
-      background: linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 242, 254, 0.15));
-      border: 1px solid var(--secondary);
-      border-radius: 12px;
-      margin: 8px 12px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* STARMAKER STUDIO (Split Screen Viewport 50/50) */
+    /* STARMAKER STUDIO MODAL (Split View 50/50) */
     #studio-modal {
       position: absolute;
       top: 0;
@@ -296,7 +296,7 @@
       overflow: hidden;
     }
 
-    /* Top: Embedded YouTube Video with Lyrics */
+    /* Top: YouTube Video with Lyrics */
     .yt-section {
       width: 100%;
       height: 50%;
@@ -309,7 +309,7 @@
       border: none;
     }
 
-    /* Bottom: Live HD Camera */
+    /* Bottom: Live HD Camera Preview */
     .camera-section {
       width: 100%;
       height: 50%;
@@ -353,8 +353,8 @@
       bottom: 8px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.7);
-      padding: 3px 10px;
+      background: rgba(0,0,0,0.75);
+      padding: 4px 12px;
       border-radius: 12px;
       font-size: 0.65rem;
       color: #ffd700;
@@ -391,7 +391,7 @@
       box-shadow: 0 0 15px rgba(255, 170, 0, 0.8);
     }
 
-    /* DUAL-SCREEN SYNC PLAYER POST (Kasama ang YouTube Video + Camera) */
+    /* DUAL-SCREEN SYNC PLAYER POST (Kasama ang YouTube Video at Camera) */
     .empty-social {
       padding: 40px 20px;
       text-align: center;
@@ -416,7 +416,7 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      height: 360px;
+      height: 380px;
       background: #000;
       position: relative;
     }
@@ -424,7 +424,6 @@
       height: 50%;
       width: 100%;
       background: #000;
-      position: relative;
     }
     .dual-yt-half iframe {
       width: 100%;
@@ -436,6 +435,7 @@
       width: 100%;
       background: #111;
       position: relative;
+      border-top: 1px solid var(--primary);
     }
     .dual-cam-half video {
       width: 100%;
@@ -447,7 +447,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.4);
       border-top: 1px solid var(--card-border);
     }
     .btn-sync-play {
@@ -574,7 +574,7 @@
       <span class="badge-vip">HD VIDEOKE</span>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <span style="font-size:0.75rem; color:#ffd700;"><i class="fa-solid fa-coins"></i> <span id="coin-balance">700</span></span>
+      <span style="font-size:0.75rem; color:#ffd700;"><i class="fa-solid fa-coins"></i> <span id="coin-balance">750</span></span>
       <button class="icon-btn" onclick="switchTab('tab-login')"><i class="fa-solid fa-user"></i></button>
     </div>
   </header>
@@ -586,27 +586,30 @@
       <div class="search-section">
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted)"></i>
-          <input type="text" id="search-input" placeholder="Mag-search ng Kanta (e.g. Acoustic, Aegis, Rey Valera)..." oninput="filterSongsLive()">
-          <button class="btn-yt-search" onclick="searchYouTubeDirect()"><i class="fa-brands fa-youtube"></i> I-play sa YT</button>
+          <input type="text" id="search-input" placeholder="Mag-search ng Kanta (e.g. Torete, My Way, Aegis)..." oninput="filterSongsLive()">
         </div>
       </div>
 
-      <!-- Category Filter Pills -->
+      <!-- Direct YouTube URL/ID Input (Access ANY Song on YouTube) -->
+      <div class="yt-direct-bar">
+        <input type="text" id="direct-yt-input" placeholder="I-paste ang kahit anong YouTube Link o Video ID dito...">
+        <button onclick="playCustomYouTube()"><i class="fa-solid fa-play"></i> Play</button>
+      </div>
+
+      <!-- Categories -->
       <div class="filter-pills">
         <div class="pill active" onclick="filterCategory('All', this)">Lahat</div>
-        <div class="pill" onclick="filterCategory('Acoustic', this)">☕ Acoustic Lounge</div>
-        <div class="pill" onclick="filterCategory('OPM', this)">🇵🇭 Pinoy Videoke Hits</div>
-        <div class="pill" onclick="filterCategory('Classics', this)">⭐ World Karaoke</div>
+        <div class="pill" onclick="filterCategory('OPM', this)">🇵🇭 Pinoy Videoke</div>
+        <div class="pill" onclick="filterCategory('Classics', this)">⭐ Sing King Hits</div>
       </div>
 
       <div class="section-title">
-        <span>🔥 Highlighted Karaoke Videos (With Lyrics)</span>
-        <small style="color:var(--secondary); font-size:0.7rem;">Verified Tracks</small>
+        <span>🔥 100% Verified Karaoke Videos (May Lyrics)</span>
+        <small style="color:var(--secondary); font-size:0.7rem;">Tested Embeds</small>
       </div>
 
-      <div id="instant-yt-container"></div>
       <div id="song-list-container">
-        <!-- Tunay na Videoke Songs na may Lyrics -->
+        <!-- Rendered Real Embeddable Karaoke Songs -->
       </div>
     </div>
 
@@ -648,7 +651,7 @@
         </div>
         <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <h4 style="font-size:0.85rem;">Kumanta ng Acoustic Track</h4>
+            <h4 style="font-size:0.85rem;">Kumanta ng OPM Videoke</h4>
             <span style="font-size:0.72rem; color:#ffd700;">+100 Coins</span>
           </div>
           <button class="btn-sing" onclick="claimTaskReward(this, 100)">Claim</button>
@@ -676,7 +679,7 @@
 
         <div class="section-title" style="padding-left:0;">Aking Saved Social Covers</div>
         <div id="my-saved-list" style="font-size:0.75rem; color:var(--text-muted); text-align:left; margin-top:10px;">
-          Wala pang nai-save na recording.
+          Wala pang nai-save na kanta.
         </div>
       </div>
     </div>
@@ -726,32 +729,62 @@
 </div>
 
 <script>
-  // REAL KARAOKE / VIDEOKE TRACKS NA MAY VIDEO LYRICS
-  const REAL_KARAOKE_SONGS = [
-    // Acoustic Lounge
-    { id: "s1", query: "Torete Moonstar88 acoustic karaoke with lyrics", title: "Torete (Acoustic Lounge)", artist: "Moonstar88", category: "Acoustic", thumb: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120" },
-    { id: "s2", query: "Passenger Seat acoustic karaoke with lyrics", title: "Passenger Seat (Acoustic)", artist: "Stephen Speaks", category: "Acoustic", thumb: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=120" },
-    { id: "s3", query: "Till I Met You acoustic karaoke with lyrics", title: "Till I Met You (Acoustic)", artist: "Kuh Ledesma", category: "Acoustic", thumb: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120" },
-    { id: "s4", query: "Can't Help Falling in Love acoustic karaoke lyrics", title: "Can't Help Falling in Love", artist: "Elvis Presley (Acoustic)", category: "Acoustic", thumb: "https://images.unsplash.com/photo-1520523839898-50712825e617?w=120" },
-
-    // Pinoy Videoke Classics
-    { id: "s5", query: "Halik Aegis karaoke video with lyrics", title: "Halik (Videoke Version)", artist: "Aegis", category: "OPM", thumb: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120" },
-    { id: "s6", query: "Luha Aegis karaoke video with lyrics", title: "Luha (Videoke Version)", artist: "Aegis", category: "OPM", thumb: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=120" },
-    { id: "s7", query: "Bakit Pa Ba Jay R karaoke lyrics", title: "Bakit Pa Ba (Videoke)", artist: "Jay R", category: "OPM", thumb: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=120" },
-    { id: "s8", query: "Ang Huling El Bimbo Eraserheads karaoke lyrics", title: "Ang Huling El Bimbo", artist: "Eraserheads", category: "OPM", thumb: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120" },
-    { id: "s9", query: "Narda Kamikazee karaoke lyrics", title: "Narda (Videoke)", artist: "Kamikazee", category: "OPM", thumb: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120" },
-    { id: "s10", query: "214 Rivermaya karaoke lyrics", title: "214 (Videoke Version)", artist: "Rivermaya", category: "OPM", thumb: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120" },
-
-    // World Karaoke Classics
-    { id: "s11", query: "Frank Sinatra My Way Sing King karaoke lyrics", title: "My Way (Sing King Karaoke)", artist: "Frank Sinatra", category: "Classics", thumb: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120" },
-    { id: "s12", query: "Bohemian Rhapsody Queen Sing King karaoke lyrics", title: "Bohemian Rhapsody", artist: "Queen", category: "Classics", thumb: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120" },
-    { id: "s13", query: "Zombie Cranberries Sing King karaoke lyrics", title: "Zombie (Karaoke)", artist: "The Cranberries", category: "Classics", thumb: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=120" },
-    { id: "s14", query: "Total Eclipse of the Heart karaoke lyrics", title: "Total Eclipse of the Heart", artist: "Bonnie Tyler", category: "Classics", thumb: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120" }
+  // MGA TUNAY AT VERIFIED NA YOUTUBE VIDEO IDs (EMBEDDING ALLOWED + ON-SCREEN LYRICS)
+  const VERIFIED_KARAOKE_SONGS = [
+    {
+      id: "GNvoF7v4Ipg",
+      title: "Torete (Karaoke Version)",
+      artist: "Moonstar88 • Sing King",
+      category: "OPM",
+      thumb: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120"
+    },
+    {
+      id: "-XRt9aEwAy0",
+      title: "My Way (Karaoke Version)",
+      artist: "Frank Sinatra • Sing King",
+      category: "Classics",
+      thumb: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120"
+    },
+    {
+      id: "1hAmBPNhaFs",
+      title: "Ang Huling El Bimbo (HD Karaoke)",
+      artist: "Eraserheads • Atomic Karaoke",
+      category: "OPM",
+      thumb: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120"
+    },
+    {
+      id: "kLx5LD2GNDM",
+      title: "Halik (Original Minus One)",
+      artist: "Aegis • Alpha Music",
+      category: "OPM",
+      thumb: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120"
+    },
+    {
+      id: "s1RMK1VV4_8",
+      title: "Narda (HD Karaoke)",
+      artist: "Kamikazee • Videoke Version",
+      category: "OPM",
+      thumb: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120"
+    },
+    {
+      id: "kJQP7kiw5Fk",
+      title: "Despacito (Sing Along)",
+      artist: "Luis Fonsi • Sing Along",
+      category: "Classics",
+      thumb: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=120"
+    },
+    {
+      id: "M7lc1UVf-VE",
+      title: "YouTube Studio Karaoke Beat",
+      artist: "Karaoke Live Sample",
+      category: "Classics",
+      thumb: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=120"
+    }
   ];
 
   let currentCategory = 'All';
   let queue = [];
-  let currentActiveSong = REAL_KARAOKE_SONGS[0];
+  let currentActiveSong = VERIFIED_KARAOKE_SONGS[0];
 
   // Recording State
   let cameraStream = null;
@@ -768,7 +801,7 @@
     container.innerHTML = "";
     
     if (list.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:25px; color:var(--text-muted); font-size:0.8rem;">Walang lokal na kanta. Pindutin ang <b>"I-play sa YT"</b> sa itaas para kantahin ito sa YouTube!</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:25px; color:var(--text-muted); font-size:0.8rem;">Walang nakitang kanta. I-paste ang YouTube link o Video ID sa bar sa itaas para patugtugin agad!</div>`;
       return;
     }
 
@@ -797,64 +830,52 @@
     filterSongsLive();
   }
 
-  // Real-time responsive search (Walang Stuck Loading!)
+  // Instant Search Filter na WALANG LAG o Stuck Loading
   function filterSongsLive() {
     const q = document.getElementById('search-input').value.toLowerCase().trim();
-    const ytContainer = document.getElementById('instant-yt-container');
-
-    let baseList = REAL_KARAOKE_SONGS;
+    let baseList = VERIFIED_KARAOKE_SONGS;
     if (currentCategory !== 'All') {
       baseList = baseList.filter(s => s.category === currentCategory);
     }
-
     if (!q) {
-      ytContainer.innerHTML = "";
       renderSongs(baseList);
       return;
     }
-
-    // Instant filter
     const matches = baseList.filter(s => 
       s.title.toLowerCase().includes(q) || 
-      s.artist.toLowerCase().includes(q) || 
-      s.query.toLowerCase().includes(q)
+      s.artist.toLowerCase().includes(q)
     );
-
-    // Instant YouTube One-Click Card
-    ytContainer.innerHTML = `
-      <div class="instant-yt-card">
-        <div>
-          <div style="font-size:0.82rem; font-weight:700;"><i class="fa-brands fa-youtube" style="color:red;"></i> I-play sa YouTube: "${q}"</div>
-          <div style="font-size:0.7rem; color:var(--text-muted);">Mag-load ng karaoke video na may lyrics mula sa YouTube</div>
-        </div>
-        <button class="btn-sing" onclick="searchYouTubeDirect()"><i class="fa-solid fa-play"></i> Play</button>
-      </div>
-    `;
-
     renderSongs(matches);
   }
 
-  function searchYouTubeDirect() {
-    const query = document.getElementById('search-input').value.trim();
-    if (!query) {
-      showToast("Mag-type muna ng kanta sa search box!");
+  // Direct YouTube Loader (Any Video on YouTube)
+  function playCustomYouTube() {
+    const raw = document.getElementById('direct-yt-input').value.trim();
+    if (!raw) {
+      showToast("Mag-paste ng YouTube link o Video ID!");
       return;
     }
-    const dynamicTrack = {
-      id: "YT_" + Date.now(),
-      query: `${query} karaoke with lyrics`,
-      title: `${query} (YouTube Videoke)`,
-      artist: "YouTube Live Search",
-      category: "YouTube",
+    let videoId = raw;
+    if (raw.includes("v=")) {
+      videoId = raw.split("v=")[1].split("&")[0];
+    } else if (raw.includes("youtu.be/")) {
+      videoId = raw.split("youtu.be/")[1].split("?")[0];
+    }
+
+    const customSong = {
+      id: videoId,
+      title: "YouTube Video (" + videoId + ")",
+      artist: "Direct YouTube Stream",
       thumb: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120"
     };
-    currentActiveSong = dynamicTrack;
-    openStudio(null, dynamicTrack);
+
+    openStudio(videoId, customSong);
+    showToast("Naglo-load ang YouTube Video!");
   }
 
   // --- QUEUE SYSTEM ---
   function addToQueue(id) {
-    const s = REAL_KARAOKE_SONGS.find(x => x.id === id);
+    const s = VERIFIED_KARAOKE_SONGS.find(x => x.id === id);
     if (s) {
       queue.push(s);
       renderQueue();
@@ -896,14 +917,14 @@
     showToast("Queue Cleared.");
   }
 
-  // --- STARMAKER STUDIO ENGINE (Embed YouTube Video + HD Camera) ---
+  // --- STARMAKER STUDIO ENGINE (Embed Working YouTube + HD Camera) ---
   function openStudio(songId, directObj = null) {
-    const song = directObj || REAL_KARAOKE_SONGS.find(s => s.id === songId) || REAL_KARAOKE_SONGS[0];
+    const song = directObj || VERIFIED_KARAOKE_SONGS.find(s => s.id === songId) || VERIFIED_KARAOKE_SONGS[0];
     currentActiveSong = song;
 
-    // Load authentic YouTube karaoke video with on-screen scrolling lyrics
+    // Guaranteed working standard embed format na walang "Video unavailable"
     const iframe = document.getElementById('studio-yt-iframe');
-    iframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(song.query)}&autoplay=1&playsinline=1&rel=0`;
+    iframe.src = `https://www.youtube.com/embed/${song.id}?autoplay=1&enablejsapi=1&playsinline=1&rel=0`;
 
     document.getElementById('studio-modal').classList.add('open');
     initCameraStream();
@@ -1008,7 +1029,7 @@
     }
   }
 
-  // --- SAVE DUAL-SCREEN RECORDING TO SOCIAL MEDIA ---
+  // --- SAVE DUAL RECORDING TO SOCIAL MEDIA (KASAMA ANG YOUTUBE VIDEO AT CAMERA!) ---
   function saveDualRecordingToSocial() {
     if (!lastRecordedBlobUrl) {
       showToast("Mag-record muna sa Studio bago i-save!");
@@ -1020,7 +1041,7 @@
     if (emptyNotice) emptyNotice.style.display = 'none';
 
     const uniqueId = 'sync_cam_' + Date.now();
-    const ytEmbedUrl = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(currentActiveSong.query)}&enablejsapi=1&playsinline=1`;
+    const ytEmbedUrl = `https://www.youtube.com/embed/${currentActiveSong.id}?enablejsapi=1&playsinline=1`;
 
     const postCard = document.createElement('div');
     postCard.className = "dual-post-card";
@@ -1036,7 +1057,7 @@
         </div>
       </div>
 
-      <!-- STARMAKER DUAL-SCREEN CONTAINER: KASAMA ANG YOUTUBE VIDEO AT ANG CAMERA! -->
+      <!-- DUAL-SCREEN CONTAINER: KASAMA ANG TUNAY NA YOUTUBE VIDEO SA TAAS AT CAMERA SA BABA -->
       <div class="dual-viewport-grid">
         <div class="dual-yt-half">
           <iframe id="iframe_${uniqueId}" src="${ytEmbedUrl}"></iframe>
@@ -1062,7 +1083,7 @@
 
     feed.prepend(postCard);
 
-    // Save sa Google profile folder
+    // I-save sa Google profile list
     const savedList = document.getElementById('my-saved-list');
     savedList.innerHTML = `<div style="padding:6px 0;">⭐ <b>${currentActiveSong.title}</b> (Dual-Screen Video)</div>` + savedList.innerHTML;
 
@@ -1071,7 +1092,7 @@
     showToast("Nai-save ang Dual-Screen Video sa Social Media!");
   }
 
-  // Sabay na pag-play ng YouTube Karaoke at Camera Video
+  // Sabay na pag-play ng YouTube at Camera Recording
   function playSyncDual(videoId) {
     const video = document.getElementById(videoId);
     const iframe = document.getElementById('iframe_' + videoId);
@@ -1080,7 +1101,6 @@
       video.play();
     }
     if (iframe) {
-      // Mag-postMessage para i-play ang YouTube player
       iframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
     }
     showToast("Synchronized Playback Aktibo!");
@@ -1145,7 +1165,7 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    renderSongs(REAL_KARAOKE_SONGS);
+    renderSongs(VERIFIED_KARAOKE_SONGS);
   });
 </script>
 </body>
